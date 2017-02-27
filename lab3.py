@@ -67,11 +67,22 @@ def mlParams(X, labels, W=None):
     sigma = np.zeros((Nclasses,Ndims,Ndims))
 
     # TODO: fill in the code to compute mu and sigma!
-    # ==========================
-    
-    # ==========================
-
+    klasses = np.unique(labels)
+    i = 0
+    for idx, klass in enumerate(klasses):
+        idx = np.where(labels==klass)[0]
+        xlc = X[idx, :]
+        mu[i] = np.sum(xlc, axis=0)/np.size(xlc)
+        sigma[i] = np.diag(np.sum((xlc - mu[i])**2, axis=0)/np.size(xlc))
+        cov = computeCov(xlc, mu[i])
+        sigma[i] += np.diag([cov, cov])[:, ::-1]
+        i += 1
     return mu, sigma
+
+def computeCov(X, mean):
+    X -= mean
+    N = X.shape[0]
+    return np.diag(np.dot(X.T, X)[:, ::-1])[0]
 
 # in:      X - N x d matrix of M data points
 #      prior - C x 1 matrix of class priors
@@ -121,7 +132,7 @@ class BayesClassifier(object):
 
 X, labels = genBlobs(centers=5)
 mu, sigma = mlParams(X,labels)
-plotGaussian(X,labels,mu,sigma)
+#plotGaussian(X,labels,mu,sigma)
 
 
 # Call the `testClassifier` and `plotBoundary` functions for this part.
