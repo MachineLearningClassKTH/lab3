@@ -39,14 +39,16 @@ def computePrior(labels, W=None):
         assert(W.shape[0] == Npts)
     classes = np.unique(labels)
     Nclasses = np.size(classes)
-
     prior = np.zeros((Nclasses,1))
 
     # TODO: compute the values of prior for each class!
     # ==========================
-    
+    i = 0;
+    print(Npts)
+    for idx, klass in enumerate(classes):
+        idx = np.where(labels==klass)[0]
+        prior[:, i] = idx.shape[0] / Npts
     # ==========================
-
     return prior
 
 # NOTE: you do not need to handle the W argument for this part!
@@ -82,7 +84,7 @@ def mlParams(X, labels, W=None):
 def computeCov(X, mean):
     X -= mean
     N = X.shape[0]
-    return np.diag(np.dot(X.T, X)[:, ::-1])[0]
+    return np.diag(np.dot(X.T, X)[:, ::-1])[0]/N
 
 # in:      X - N x d matrix of M data points
 #      prior - C x 1 matrix of class priors
@@ -94,12 +96,12 @@ def classifyBayes(X, prior, mu, sigma):
     Npts = X.shape[0]
     Nclasses,Ndims = np.shape(mu)
     logProb = np.zeros((Nclasses, Npts))
-
     # TODO: fill in the code to compute the log posterior logProb!
     # ==========================
-    
+    for i in range(Npts):
+        for j in range(Nclasses):
+            logProb[j, i] = -(1/2) * np.log(abs(np.linalg.det(sigma[j]))) - (1/2) * np.dot(np.dot((X[i] - mu[j]), np.linalg.inv(sigma[j])), (X[i] - mu[j]).T)+ np.log(prior[j])
     # ==========================
-    
     # one possible way of finding max a-posteriori once
     # you have computed the log posterior
     h = np.argmax(logProb,axis=0)
@@ -131,7 +133,9 @@ class BayesClassifier(object):
 
 
 X, labels = genBlobs(centers=5)
+prior = computePrior(labels)
 mu, sigma = mlParams(X,labels)
+classifyBayes(X,prior, mu, sigma)
 #plotGaussian(X,labels,mu,sigma)
 
 
