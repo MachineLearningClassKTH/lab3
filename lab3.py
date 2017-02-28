@@ -75,7 +75,7 @@ def mlParams(X, labels, W=None):
         xlc = X[idx, :]
         mu[i] = np.sum(xlc, axis=0)/np.size(xlc)
         xlc -= mu[i]
-        sigma[i] = np.dot(xlc.T, xlc)/xlc.shape[0]
+        sigma[i] = np.diag(np.diag(np.dot(xlc.T, xlc)/xlc.shape[0]))
         i += 1
     return mu, sigma
 
