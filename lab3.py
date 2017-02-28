@@ -73,10 +73,11 @@ def mlParams(X, labels, W=None):
     for idx, klass in enumerate(klasses):
         idx = np.where(labels==klass)[0]
         xlc = X[idx, :]
-        mu[i] = np.sum(xlc, axis=0)/np.size(xlc)
+        mu[i] = np.dot(xlc.T, W[idx]).T/np.sum(W[idx])
         xlc -= mu[i]
-        sigma[i] = np.dot(xlc.T, xlc)/xlc.shape[0]
+        sigma[i] = np.diag(np.diag(np.dot(W[idx].T * xlc.T, xlc)/np.sum(W[idx])))
         i += 1
+    print(sigma)
     return mu, sigma
 
 # in:      X - N x d matrix of M data points
@@ -233,7 +234,7 @@ class BoostClassifier(object):
 # Call the `testClassifier` and `plotBoundary` functions for this part.
 
 
-testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='iris',split=0.7)
+#testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='iris',split=0.7)
 
 
 
@@ -241,7 +242,7 @@ testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='iris',split=0.
 
 
 
-plotBoundary(BoostClassifier(BayesClassifier()), dataset='iris',split=0.7)
+#plotBoundary(BoostClassifier(BayesClassifier()), dataset='iris',split=0.7)
 #plotBoundary(BoostClassifier(BayesClassifier()), dataset='vowel',split=0.7)
 
 
