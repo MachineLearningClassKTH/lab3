@@ -44,7 +44,6 @@ def computePrior(labels, W=None):
     # TODO: compute the values of prior for each class!
     # ==========================
     i = 0;
-    print(Npts)
     for idx, klass in enumerate(classes):
         idx = np.where(labels==klass)[0]
         prior[:, i] = idx.shape[0] / Npts
@@ -75,16 +74,10 @@ def mlParams(X, labels, W=None):
         idx = np.where(labels==klass)[0]
         xlc = X[idx, :]
         mu[i] = np.sum(xlc, axis=0)/np.size(xlc)
-        sigma[i] = np.diag(np.sum((xlc - mu[i])**2, axis=0)/np.size(xlc))
-        cov = computeCov(xlc, mu[i])
-        sigma[i] += np.diag([cov, cov])[:, ::-1]
+        xlc -= mu[i]
+        sigma[i] = np.dot(xlc.T, xlc)/xlc.shape[0]
         i += 1
     return mu, sigma
-
-def computeCov(X, mean):
-    X -= mean
-    N = X.shape[0]
-    return np.diag(np.dot(X.T, X)[:, ::-1])[0]/N
 
 # in:      X - N x d matrix of M data points
 #      prior - C x 1 matrix of class priors
@@ -100,7 +93,7 @@ def classifyBayes(X, prior, mu, sigma):
     # ==========================
     for i in range(Npts):
         for j in range(Nclasses):
-            logProb[j, i] = -(1/2) * np.log(abs(np.linalg.det(sigma[j]))) - (1/2) * np.dot(np.dot((X[i] - mu[j]), np.linalg.inv(sigma[j])), (X[i] - mu[j]).T)+ np.log(prior[j])
+            logProb[j, i] = -(1/2) * np.log(np.linalg.det(sigma[j])) - (1/2) * np.dot(np.dot((X[i] - mu[j]), np.linalg.inv(sigma[j])), (X[i] - mu[j]).T)+ np.log(prior[j])
     # ==========================
     # one possible way of finding max a-posteriori once
     # you have computed the log posterior
@@ -240,7 +233,7 @@ class BoostClassifier(object):
 # Call the `testClassifier` and `plotBoundary` functions for this part.
 
 
-#testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='iris',split=0.7)
+testClassifier(BoostClassifier(BayesClassifier(), T=10), dataset='iris',split=0.7)
 
 
 
@@ -248,7 +241,8 @@ class BoostClassifier(object):
 
 
 
-#plotBoundary(BoostClassifier(BayesClassifier()), dataset='iris',split=0.7)
+plotBoundary(BoostClassifier(BayesClassifier()), dataset='iris',split=0.7)
+#plotBoundary(BoostClassifier(BayesClassifier()), dataset='vowel',split=0.7)
 
 
 # Now repeat the steps with a decision tree classifier.
