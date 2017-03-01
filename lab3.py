@@ -212,9 +212,9 @@ def classifyBoost(X, classifiers, alphas, Nclasses):
         # here we can do it by filling in the votes vector with weighted votes
         # ==========================
         for i in range(Npts):
-            for j in range(Ncomps):
-                for k in range(Nclasses):
-                    votes[i, k] += alphas[j] * (1 if classifiers[0].classify(X)[i] == k else 0)
+            for j in range(Nclasses):
+                for k in range(Ncomps):
+                    votes[i, j] += alphas[k] * (1 if classifiers[k].classify(X)[i] == j else 0)
         # ==========================
 
         # one way to compute yPred after accumulating the votes
